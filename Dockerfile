@@ -1,29 +1,17 @@
-# Use the official Node.js image as a base
-FROM node:16 AS build
-
-# Set the working directory
+#It will use node:19-alpine3.16 as the parent image for building the Docker image
+FROM node:19-alpine3.16
+#It will create a working directory for Docker. The Docker image will be created in this working directory.
 WORKDIR /public
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
+#Copy the React.js application dependencies from the package.json to the react-app working directory.
+COPY package.json .
+COPY package-lock.json .
+#install all the React.js application dependencies
+RUN npm i
+# Copy the remaining React.js application folders and files from the `jenkins-kubernetes-deployment` local folder to the Docker react-app working directory
 COPY . .
-
-# Build the React app
-RUN npm run build
-
-# Use NGINX to serve the app
-FROM nginx:alpine
-
-# Copy built files from the previous stage
-COPY --from=build /public/build /usr/share/nginx/html
-
-# Expose port 3000
+#Expose the React.js application container on port 3000
 EXPOSE 3000
+#The command to start the React.js application container
+CMD ["npm", "start"]
 
-# Start NGINX server
-CMD ["nginx", "-g", "daemon off;"]
+
